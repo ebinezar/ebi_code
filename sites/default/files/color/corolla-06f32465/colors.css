@@ -1,0 +1,130 @@
+/* $Id: colors.css,v 1.21 2011/01/01 13:20:14 jarek Exp $ */
+
+/* Background */
+body {
+  background-color: #fefafb;
+}
+#header-menu .content > ul > li.active-trail {
+  background-color: #fefafb;
+}
+/* Text (black) */
+body,
+#site-name a,
+#header-menu .content li.active a,
+h1.page-title,
+.node h2.node-title,
+.node h1.node-title a,
+.node h2.node-title a,
+.comment h3.title a,
+.tabs ul.tabs li a,
+pre,
+code,
+samp,
+var,
+table.update tr,
+table.system-status-report tr {
+  color: #2e2e2e;
+}
+#site-name a::-moz-selection {
+  background-color: #2e2e2e;
+}
+#site-name a::selection {
+  background-color: #2e2e2e;
+}
+.node-title a::-moz-selection {
+  background-color: #2e2e2e;
+}
+.node-title a::selection {
+  background-color: #2e2e2e;
+}
+/* Link (blue) */
+a,
+a.active,
+li a.active {
+  color: #6c0d28;
+}
+legend {
+  background-color: #6c0d28;
+}
+/* Link hovered (orange) */
+a:hover,
+a:focus,
+a.active:hover,
+a.active:focus,
+li a.active:hover,
+li a.active:focus {
+  color: #e25401;
+  border-bottom-color: #e25401;
+}
+.node h1.node-title a:hover,
+.node h2.node-title a:hover {
+  color: #e25401;
+}
+/* Link underline (light blue) */
+a {
+  border-bottom: 1px solid #eac8d1;
+}
+/* Header menu (black) */
+#header-menu-wrapper {
+  background-color: #6c0d28;
+}
+/* Header menu hovered (orange) */
+#header-menu .content li a:hover,
+#header-menu .content li a:active,
+#header-menu .content li a:focus {
+  background-color: #83a80e;
+}
+/* Slogan (orange) */
+#site-slogan {
+  color: #e25401;
+}
+#site-slogan::selection {
+  background-color:  #e25401;
+}
+#site-slogan::-moz-selection {
+  background-color:  #e25401;
+}
+.poll .bar .foreground {
+  background-color: #e25401!important;
+}
+/* Border (gray) */
+#page {
+  border: 1px solid #f7d6e2;
+}
+/* Border strong (dark gray) */
+#sidebar-first input,
+#sidebar-second input {
+  border: 1px solid #d9a3b7;
+}
+.tabs ul.tabs li a {
+  border: 1px solid #d9a3b7;
+}
+/* Tab */
+.tabs ul.tabs li a {
+  background-color: #fbf3f6;
+}
+ul.vertical-tabs-list li a {
+  background-color: #fbf3f6;
+}
+/* Block title (green) */
+.block h2,
+h2 {
+  color: #e25401;
+}
+.block h2::selection {
+  color: #ffffff;
+  background-color: #e25401;
+}
+.block h2::-moz-selection {
+  background-color: #e25401;
+  color: #ffffff;
+}
+/* Fieldset (gray) */
+fieldset {
+  background-color: #fefafb;
+}
+/* Fieldset border (dark gray) */
+fieldset {
+  border: 1px solid #f7d6e2;
+}
+

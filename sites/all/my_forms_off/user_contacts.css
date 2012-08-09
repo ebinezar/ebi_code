@@ -1,0 +1,73 @@
+/*
+ * @file user_contacts.css
+ * Provides css for the module
+ * @copyright Copyright(c) 2010 Lee Rowlands
+ * @license GPL v2 http://www.fsf.org/licensing/licenses/gpl.html
+ * @author Lee Rowlands contact at rowlandsgroup dot com
+ * 
+ */
+/*show the alpha links on one line*/
+.alpha-links .item-list ul li {
+  display: inline-block;
+  background-image: none;
+  list-style: none;
+  float: left;
+  padding: 0 10px 10px 0;
+}
+
+theme_contact_forms
+
+/*$row[0][1] = drupal_render($form['check'][1]);
+	$row[0][2]= drupal_render($form['check'][2]);
+	$row[0][3]= drupal_render($form['check'][3]);
+	$row[0][4]= drupal_render($form['check'][4]);
+	$row[0][5]= drupal_render($form['check'][5]);
+	$row[0][6]= drupal_render($form['check'][6]);
+	$row[0][7]= drupal_render($form['check'][7]);
+	$row[0][8]= drupal_render($form['check'][8]);
+	$row[0][9]= drupal_render($form['check'][9]);
+	$row[0][10]= drupal_render($form['check'][10]);
+	$row[0][11]= drupal_render($form['check'][11]);
+	$row[0][12]= drupal_render($form['check'][12]);
+	$row[0][13]= drupal_render($form['submit']);
+	$output .= '</th></tr></thead></table>';
+	$output .= '<table class = "sticky-enabled tableheader-processed sticky-table"><thead><tr>';
+	$output .= '<th>';
+        $output .= drupal_render($form['check'][1]);
+	$output .= '</th>';
+	$output .= '<th>';
+        $output .= drupal_render($form['check'][2]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][3]);
+	$output .= '</th>';
+	$output .= '<th>';
+        $output .= drupal_render($form['check'][4]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][5]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][6]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][7]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][8]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][9]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][10]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][11]);
+	$output .= '</th>';
+	$output .= '<th>';
+	$output .= drupal_render($form['check'][12]);
+	$output .= '</th>';
+	$output .= '<th>';
+        $output .= drupal_render($form['submit']);
+    $output .= '</th></tr></thead></table>';*/

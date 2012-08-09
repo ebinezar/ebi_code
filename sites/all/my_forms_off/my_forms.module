@@ -1,0 +1,627 @@
+<?php
+error_reporting(0);
+function my_forms_theme($existing, $type, $theme, $path) {
+	return array(
+	    'my_forms_views' => array(
+	      'arguments' => array('uid' => 0),),
+	    'search' => array(
+	      'arguments' => array('uid' => 0),),
+	'contact_block_form' => array(
+		'arguments' => array('uid' => 0),
+	       'render element' => 'form'),
+	    );
+		
+}	
+function my_forms_block_info() {
+	$block['search'] = array('info' => t('my_forms'));
+	$block['print'] = array('info' => t('print'));
+	$block['contact'] = array('info' => t('contact'));
+	$block['attendance']= array('info' => t('attendance'));
+	
+	return $block;
+ }
+function my_forms_block_view($delta = '') {
+		
+		//$block = array();
+		switch($delta)
+		{
+		case 'search':		
+		$block['subject'] = t('Search Form');
+		$block['content'] = drupal_get_form('search_block_form');
+		break;
+		case 'print':		
+		//$block['subject'] = t('Print Form');		
+		$block['content'] = drupal_get_form('print_block_form');
+		break;
+		case 'contact':		
+		$block['content'] = drupal_get_form('contact_block_form');
+		break;
+		case 'attendance':		
+		$block['content'] = drupal_get_form('attendance_block_form');
+		break;
+		}
+		return $block;
+	}
+function print_block_form()
+{
+	$form['exportby'] = array(
+		'#type' => 'select',
+		'#title'=> t('Select to Export'),		
+		'#required' => TRUE,
+		'#options' => array(		
+				0 => 'Excel',
+				1 => 'Word',
+				//2 => 'Pdf',
+				),
+				 );
+	$form['export'] = array(
+ 	 '#type' => 'submit',
+ 	 '#value' => t('Export'),
+ 	 '#submit' => array('forms_print'),
+	); 
+	return $form;
+	
+}
+function forms_print($form_id,&$form_state)
+{ 
+if(arg(0) == 'views' && arg(1) == 'search')
+{ theme_search($output); }
+else if(arg(0) == 'views')
+{ theme_my_forms_views($output); }
+
+if($form_state['values']['exportby'] == 0)
+{ $export = 'vnd.ms-excel'; $format = '.xls'; }
+if($form_state['values']['exportby'] == 1)
+{$export = 'vnd.ms-word';$format = '.doc';}
+if($form_state['values']['exportby'] == 2)
+{
+$export = 'pdf';$format = '.pdf';
+//include 'php-excel.php';
+$pdflen = strlen($output); 
+}
+   	 
+	 $filename = 'my_xls';
+   	 $encode   = 'UTF-8';
+   	 header("Content-Type: application/".$export."; charset=".$encode);
+	 header("Content-length: $pdflen");
+   	 header("Content-Disposition: inline; filename=".$filename.$format);
+	 echo stripslashes (sprintf($output));
+	 exit();
+
+}
+
+function search_block_form()
+{
+		$form['searchby'] = array(
+				'#type' => 'select',
+				'#title' => t('SearchBy'),
+				'#required' => TRUE,
+			        '#default_value' => 0, 
+				'#options' => array(		
+								0 => 'Name',
+								1 => 'Address',
+								2 => 'Region',
+						),
+				 );
+				$form['text'] = array(
+				'#title' => t('Search'),
+				'#type' =>'textfield',
+				'#required' => TRUE,
+				'#length' => 64,
+				'#size' => 20,
+				);
+		
+		$form['search'] = array (
+				'#type' => 'submit',
+				'#value' => t('Search'),
+				
+				);
+		
+		return $form; 
+	}
+function search_block_form_submit($form_id,$form_state)
+{
+return drupal_goto('views/search/'.$form_state['values']['text'].'/'.$form_state['values']['searchby']);
+}
+function my_forms_permission()
+{
+return array('form registration' => array(
+      'title' => t('form registration'),),
+ 	'form view' => array(
+      'title' => t('form view'),),
+	'form update' => array(
+      'title' => t('form update'),),
+	'form delete' => array(
+      'title' => t('form delete'),),    	
+	     );
+}
+function my_forms_menu()
+{
+$items['registration']=array(
+		'title' => 'Registration',
+		'description' => 'registration form',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('my_forms_form'),
+		'access arguments' => array('form registration'),
+		'type' => MENU_NORMAL_ITEM,
+		);
+$items['views']=array(
+		'title' => 'View',
+		'description' => 'view form',
+		'page callback' => 'theme',
+		'page arguments' => array('my_forms_views'),
+		'access arguments' => array('form view'),
+		'type' => MENU_LOCAL_TASK,
+		);
+$items['registration/edit']=array(
+		'title' => 'Edit',
+		'description' => 'Edit form',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('forms_edit'),
+		'access arguments' => array('form update'),
+		'type' => MENU_NORMAL_ITEM,
+		'file' => 'my_forms.forms_edit.inc',
+		);
+$items['registration/del']=array(
+		'title' => 'Are You Surely Want To',
+		'description' => 'Delete from Contacts',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('forms_del'),
+		'access arguments' => array('form delete'),
+		'type' => MENU_CALLBACK,
+		);
+$items['views/search']=array(
+		'title' => 'Searched results',
+		'description' => 'Searched results',
+		'page callback' => 'theme',
+		'page arguments' => array('search'),
+		'access arguments' => array('form update'),
+		'type' => MENU_NORMAL_ITEM,
+		);
+	return $items;
+	}
+function theme_search(&$out)
+	{	
+	$search = arg(2); $searchbyb = arg(3); 
+	
+	drupal_set_title('Searched Result');
+	
+		/*if($search == '')
+		{
+		return drupal_set_message(t('enter the search values'));
+		}*/
+	
+	 $query = db_select('registration','r')->extend('PagerDefault')->extend('TableSort');
+	 $query->fields('r',array('uid', 'name', 'Age','Sex','email','phone','region','addrlin1','new','prayer','film','door'));
+  	 $query->limit(10);
+
+      switch ($searchbyb) {
+      case 0:
+        $query->condition('name',  db_like($search) . '%', 'LIKE');
+        break;
+      case 1:
+        $query->condition('addrlin1', '%' . db_like($search) . '%', 'LIKE');
+        break;
+      case 2:
+	$query->condition('region', '%' . db_like($search) . '%', 'LIKE');
+      default:
+     	}
+	$result = $query->execute();
+	$i=0;
+	while($node = $result->fetchAssoc()) 
+	{
+    	$rows[$i]['uid'] = $node['uid'] ? $node['uid'] :'N/A';
+  	$rows[$i]['name'] = $node ['name'] ? $node ['name'] :'N/A';
+	$rows[$i]['age'] = $node['age'] ? $node['age'] :'N/A';
+	$rows[$i]['sex'] = $node['sex'] ? $node['sex'] :'N/A';
+  	$rows[$i]['email'] = $node['email'] ? $node['email'] :'N/A';
+  	$rows[$i]['phone'] = $node['phone'] ? $node['phone'] :'N/A';
+	$rows[$i]['region'] = $node['region'] ? $node['region'] :'N/A';
+	$rows[$i]['addrlin1'] = $node['addrlin1'] ? $node['addrlin1'] :'N/A';
+	//$rows[$i]['addrlin2'] = $node['addrlin2'] ? $node['addrlin2'] :'N/A';
+	$rows[$i]['new'] = $node['new'] ? $node['new'] :'N/A';
+	$rows[$i]['prayer'] = $node['prayer'] ? $node['prayer'] :'N/A';
+	$rows[$i]['film'] = $node['film'] ? $node['film'] :'N/A';
+	$rows[$i]['door'] = $node['door'] ? $node['door'] :'N/A';
+	$uid = $node['uid'];
+	$edit = l('Edit','registration/edit/'.$uid);	
+	$delete = l('Delete','registration/del/'.$uid);
+	$rows[$i]['Edit'] = $edit;	
+	$rows[$i]['Delete'] = $delete;
+	
+
+	$head = array('S.NO','NAME','AGE','SEX','EMAIL ID','PHONE NO','REGION','ADDRESS','NEW COMER','PRAYER BOOTH','FILM SHOW','DOOR TO DOOR');
+	$row[$i]['uid'] = $node['uid'] ? $node['uid'] :'N/A';
+	$row[$i]['name'] = $node ['name'] ? $node ['name'] :'N/A';
+	$row[$i]['age'] = $node['age'] ? $node['age'] :'N/A';
+	$row[$i]['sex'] = $node['sex'] ? $node['sex'] :'N/A';
+  	$row[$i]['email'] = $node['email'] ? $node['email'] :'N/A';
+  	$row[$i]['phone'] = $node['phone'] ? $node['phone'] :'N/A';
+	$row[$i]['region'] = $node['region'] ? $node['region'] :'N/A';
+	$row[$i]['addrlin1'] = $node['addrlin1'] ? $node['addrlin1'] :'N/A';
+	$row[$i]['new'] = $node['new'] ? $node['new'] :'N/A';
+	$row[$i]['prayer'] = $node['prayer'] ? $node['prayer'] :'N/A';
+	$row[$i]['film'] = $node['film'] ? $node['film'] :'N/A';
+	$row[$i]['door'] = $node['door'] ? $node['door'] :'N/A';
+	
+	$variable['header']= $head;
+	$variable['rows'] = $row;
+	$variable['attributes']= array();
+	$variable['caption']= NULL;
+	$variable['colgroups']= NULL;
+	$variable['sticky']= TRUE;
+	$variable['empty']= NULL;
+	$i++;
+  }	
+	$out = theme_table($variable);
+			
+	$header = array('S.NO', 'NAME','AGE','SEX','EMAIL ID','PHONE NO','REGION','ADDRESS','NEW COMER','PRAYER BOOTH','FILM SHOW','DOOR TO DOOR','UPDATE','DELETE');
+	if ($i>0) {
+	$variables['header']= $header;
+	$variables['rows'] = $rows;
+	$variables['attributes']= array();
+	$variables['caption']= NULL;
+	$variables['colgroups']= NULL;
+	$variables['sticky']= TRUE;
+	$variables['empty']= NULL;
+	 }
+     else {
+          return drupal_set_message(t('No contacts have been created'));
+	}
+	$output = theme_table($variables);
+	$output .= theme('pager');
+	return $output;
+  }
+
+
+
+
+
+/*function user_contacts_init() {
+  drupal_add_css(drupal_get_path('module', 'my_forms') .'/user_contacts.css');
+}*/
+
+function my_forms_form()
+	{	
+$form['name'] = array(
+				'#type' => 'textfield',
+				'#title' => t('Name:'),
+				'#required' => TRUE,
+				'#length' => 64,
+				'#size' => 20,
+				);
+$form['age'] = array(
+				'#type' => 'textfield',
+				'#title' => t('Age:'),
+				'#length' => 64,
+				'#size' => 5,
+				);
+$form['sex'] = array(
+				'#type' => 'radios',
+				'#title' => t('Sex:'),
+				'#options' => array(1 => 'male',2 => 'female'),
+				
+				);
+								
+$form['email'] = array(
+				'#type' => 'textfield',
+				'#title' => t('Email ID:'),
+				'#rules' => array('email','length[10,20]'),
+				'#length' => 64,
+				'#size' => 20,
+				);
+$form['phone'] = array(
+				'#type' => 'textfield',
+				'#title' => t('Phone No:'),
+				'#length' => 64,
+				'#size' => 20,
+				);
+$form['region'] = array(
+				'#type' => 'select',
+				'#title' => t('Select the preffered Region'),
+				'#required' => TRUE,
+				'#options' => array(		0 => 'T1',
+								1 => 'T2',
+								2 => 'T3',
+								3 => 'T4',
+								4 => 'T5',
+								5 => 'T6',6 => 'T7',7 => 'T8',8 => 'T9',9 => 'T10',),
+				);
+$form['addrlin1'] = array(
+				'#type' => 'textfield',
+				'#title' => t('Address: (Give Space Between Each Word)'),
+				'#required' => TRUE,
+				'#description' => t('Address should contain 64 character only'),
+				'#length' => 64,
+				'#size' => 25,
+				
+				);
+$form['check'] = array(
+				'#type' => 'checkboxes',
+				'#title' => t('Select preffered options'),
+				'#options' => array(
+								1 => 'New comer',
+								2 => 'Prayer booth',
+								3 => 'Film show',
+								4 => 'Door to door'),
+				
+				);
+$form['submit'] = array(
+		    '#type' => 'submit',
+    		    '#value' => t('Submit'),
+		);
+
+/*$form['view'] = array('#type' => 'button',
+    		    '#value' => t('View'),
+		    '#attributes'=> array('onclick'=>'test();'),
+  		);*/
+			
+		return $form;
+	}
+function my_forms_form_validate($form_id,&$form)
+{
+$f=$form['values']['name'];
+if($f != '')
+{
+if(is_numeric($f))
+form_set_error("name","please enter alphabetic value");
+} }			
+function my_forms_form_submit($form_id, $form_state) { //echo '<pre>';print_r($form_state['values']['check'][2]);die;
+	
+	if($form_state['values']['sex'] == 1)
+	{
+	$sex="male";
+	}else $sex="female";
+	if($form_state['values']['check'][1] == 1)
+	{ 
+	$value1="Yes";
+	}else $value1="N/A";
+	if($form_state['values']['check'][2] == 2)
+	{
+	$value2 ="Yes";
+	}else $value2="N/A";
+	if($form_state['values']['check'][3] == 3)
+	{
+	$value3 ="Yes";
+	}else $value3="N/A";
+	if($form_state['values']['check'][4] == 4)
+	$value4 ="Yes";
+	else $value4="N/A";
+	//if(isset($form_state['region'])){
+	if($form_state['values']['region'] == 0)
+	$value="T1";
+	if($form_state['values']['region'] == 1)
+	$value="T2";
+	if($form_state['values']['region'] == 2)
+	$value="T3";
+	if($form_state['values']['region'] == 3)
+	$value="T4";
+	if($form_state['values']['region'] == 4)
+	$value="T5";
+	if($form_state['values']['region'] == 5)
+	$value="T6";
+	if($form_state['values']['region'] == 6)
+	$value="T7";
+	if($form_state['values']['region'] == 7)
+	$value="T8";
+	if($form_state['values']['region'] == 8)
+	$value="T9";
+	if($form_state['values']['region'] == 9)
+	$value="T10";
+	//}	
+	
+   $nid = db_insert('registration')
+  ->fields(array('uid', 'name', 'Age','Sex','email','phone','region','addrlin1','new','prayer','film','door'))
+  ->values(array(
+    'uid' => NULL,
+    'name' => $form_state['values']['name'],
+    'Age' =>$form_state['values']['age'] ,
+	'Sex' =>$sex ,
+	'email' =>$form_state['values']['email'] ,
+	'phone' =>$form_state['values']['phone'],
+	'region' =>$value,
+	'addrlin1' =>$form_state['values']['addrlin1'],
+	//'addrlin2' =>$form_state['values']['addrlin2'],
+	'new' => $value1,
+	'prayer' => $value2,
+	'film' => $value3,
+	'door' => $value4,
+  ))
+  ->execute();
+   drupal_set_message(t('The form submitted successfully'));
+   
+}
+
+function theme_my_forms_views(&$out)
+	{
+
+      drupal_set_title('Contact List'); 
+	$header = array();
+
+	$header = array('S.NO', 'NAME','AGE','SEX','EMAIL ID','PHONE NO','REGION','ADDRESS','NEW COMER','PRAYER BOOTH','FILM SHOW','DOOR TO DOOR','UPDATE','DELETE');
+	    	
+	$query = db_select('registration','r')->extend('PagerDefault')->extend('TableSort');
+    $query->fields('r',array('uid', 'name', 'Age','Sex','email','phone','region','addrlin1','new','prayer','film','door'));
+   // ->orderBy('uid', 'DESC')
+    //->range(0,20);//LIMIT to 20 records
+    $query->limit(10);
+    $result = $query->execute();		
+	$i=1;	
+	 while($node = $result->fetchAssoc()) 
+	{
+	 
+        $rows[$i]['uid'] = $node['uid'] ? $node['uid'] :'N/A';
+  	$rows[$i]['name'] = $node ['name'] ? $node ['name'] :'N/A';
+	$rows[$i]['age'] = $node['age'] ? $node['age'] :'N/A';
+	$rows[$i]['sex'] = $node['sex'] ? $node['sex'] :'N/A';
+  	$rows[$i]['email'] = $node['email'] ? $node['email'] :'N/A';
+  	$rows[$i]['phone'] = $node['phone'] ? $node['phone'] :'N/A';
+	$rows[$i]['region'] = $node['region'] ? $node['region'] :'N/A';
+	$rows[$i]['addrlin1'] = $node['addrlin1'] ? $node['addrlin1'] :'N/A';
+	//$rows[$i]['addrlin2'] = $node['addrlin2'] ? $node['addrlin2'] :'N/A';
+	$rows[$i]['new'] = $node['new'] ? $node['new'] :'N/A';
+	$rows[$i]['prayer'] = $node['prayer'] ? $node['prayer'] :'N/A';
+	$rows[$i]['film'] = $node['film'] ? $node['film'] :'N/A';
+	$rows[$i]['door'] = $node['door'] ? $node['door'] :'N/A';
+	$uid = $node['uid'];
+	$edit = l('Edit','registration/edit/'.$uid);	
+	$delete = l('Delete','registration/del/'.$uid);
+	$rows[$i]['Edit'] = $edit;	
+	$rows[$i]['Delete'] = $delete;
+	
+	
+	$head = array('S.NO','NAME','AGE','SEX','EMAIL ID','PHONE NO','REGION','ADDRESS','NEW COMER','PRAYER BOOTH','FILM SHOW','DOOR TO DOOR');
+	$row[$i]['uid'] = $node['uid'] ? $node['uid'] :'N/A';
+	$row[$i]['name'] = $node ['name'] ? $node ['name'] :'N/A';
+	$row[$i]['age'] = $node['age'] ? $node['age'] :'N/A';
+	$row[$i]['sex'] = $node['sex'] ? $node['sex'] :'N/A';
+  	$row[$i]['email'] = $node['email'] ? $node['email'] :'N/A';
+  	$row[$i]['phone'] = $node['phone'] ? $node['phone'] :'N/A';
+	$row[$i]['region'] = $node['region'] ? $node['region'] :'N/A';
+	$row[$i]['addrlin1'] = $node['addrlin1'] ? $node['addrlin1'] :'N/A';
+	$row[$i]['new'] = $node['new'] ? $node['new'] :'N/A';
+	$row[$i]['prayer'] = $node['prayer'] ? $node['prayer'] :'N/A';
+	$row[$i]['film'] = $node['film'] ? $node['film'] :'N/A';
+	$row[$i]['door'] = $node['door'] ? $node['door'] :'N/A';
+	
+	
+	$variable['header']= $head;
+	$variable['rows'] = $row;
+	$variable['attributes']= array();
+	$variable['caption']= NULL;
+	$variable['colgroups']= NULL;
+	$variable['sticky']= TRUE;
+	$variable['empty']= NULL;
+	$i++;
+
+	  }	
+	$out = theme_table($variable);
+	
+	if ($i>0) {
+	
+$variables = array('header'=> array ( 0 => 'S.NO',1 =>'NAME',2 => 'AGE',3 => 'SEX',4 => 'EMAIL_ID',5 => 'PHONE_NO',6 => 'REGION',7 => 'ADDRESS',8 => 'NEW COMER',9 => 'PRAYER BOOTH',10 => 'FILM SHOW',11 => 'DOOR TO DOOR',12 =>'UPDATE',13 => 'DELETE'));
+	$variables['rows'] = $rows;
+	
+	$variables['attributes']=array();
+	$variables['caption']=NULL;
+	$variables['colgroups']=NULL;
+	$variables['sticky']=TRUE;
+	$variables['empty']=NULL;
+	  }
+    else {
+    return drupal_set_message(t('No contacts have been created.'));
+	}
+//print_r($variables);die;
+ $output  = theme_table($variables);
+  $output .= theme('pager');
+    
+	
+	return $output;
+}
+function contact_block_form()
+{
+	$form['check'] = array(
+				'#type' => 'checkboxes',
+				'#options' => array(1 => '',2 => '',3 => '',4 => '',5 => '',6 => '',7 => '',8 => '',9 => '',10 => '',11 => '',12 => '',),
+				'#attributes' => array('onclick' => 'fo()'),);
+	$form['submit'] = array(
+				'#type' => 'submit','#value' => t('ok'),);
+	/*$form['reset'] = array('#type' => 'button',
+			       '#value' => t('Reset'),
+		'#attributes' => array('onclick' => 'foo()'),);	*/		       	
+return $form;
+}
+function foo()
+{ 
+drupal_goto("http://www.google.com/");
+}
+
+
+function contact_block_form_submit($form_id,&$form_state)
+{
+$destination = drupal_get_destination();
+drupal_goto('views/search');
+}
+function theme_contact_block_form($vari,&$row)
+{
+    
+    	$form = $vari['form'];
+   	
+	$output = '<div class = "contact-forms">';
+	$output .= '<div id = "check1">';
+        $output .= drupal_render($form['check'][1]);
+	$output .= '</div>';
+	$output .= '<div id = "check2">';
+        $output .= drupal_render($form['check'][2]);
+	$output .= '</div>';
+	$output .= '<div id = "check3">';
+	$output .= drupal_render($form['check'][3]);
+	$output .= '</div>';
+	$output .= '<div id = "check4">';
+        $output .= drupal_render($form['check'][4]);
+	$output .= '</div>';
+	$output .= '<div id = "check5">';
+	$output .= drupal_render($form['check'][5]);
+	$output .= '</div>';
+	$output .= '<div id = "check6">';
+	$output .= drupal_render($form['check'][6]);
+	$output .= '</div>';
+	$output .= '<div id = "check7">';
+	$output .= drupal_render($form['check'][7]);
+	$output .= '</div>';
+	$output .= '<div id = "check8">';
+	$output .= drupal_render($form['check'][8]);
+	$output .= '</div>';
+	$output .= '<div id = "check9">';
+	$output .= drupal_render($form['check'][9]);
+	$output .= '</div>';
+	$output .= '<div id = "check10">';
+	$output .= drupal_render($form['check'][10]);
+	$output .= '</div>';
+	$output .= '<div id = "check11">';
+	$output .= drupal_render($form['check'][11]);
+	$output .= '</div>';
+	$output .= '<div id = "check12">';
+	$output .= drupal_render($form['check'][12]);
+	$output .= '</div>';
+	$output .= '<div id = "check13">';
+        $output .= drupal_render($form['submit']);
+    $output .= '</div>';
+	$output .= drupal_render($form['reset']);
+    $output .= '</div>';
+    return $output;
+
+}
+				
+function forms_del()
+{
+$form['submit'] = array(
+		    '#type' => 'submit',
+    		    '#value' => t('Delete'),
+		);
+$form['delete'] = array(
+  '#type' => 'submit',
+  '#value' => t('Cancel'),
+  '#submit' => array('forms_cancel'),
+);
+return $form;
+}
+function forms_cancel()
+{ 
+return drupal_goto('views');
+}
+
+function forms_del_submit()
+{
+$lin=arg(2);
+
+if(isset($lin))
+{		
+$del = db_delete('registration')
+ 		 ->condition('uid', $lin)
+  		 ->execute();
+$link= drupal_goto('views');
+}
+
+}
+

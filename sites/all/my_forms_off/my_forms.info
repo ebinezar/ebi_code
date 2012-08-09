@@ -1,0 +1,5 @@
+; $Id: 
+name = my_forms
+description = Enables the creation of forms.
+core = 7.x
+

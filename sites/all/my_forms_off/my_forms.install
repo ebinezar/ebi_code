@@ -1,0 +1,127 @@
+<?php
+/*
+ * @file my_forms.install
+ * Install and schema hooks for my_forms module
+ * @copyright Copyright(c) 2010 Lee Rowlands
+ * @license GPL v2 http://www.fsf.org/licensing/licenses/gpl.html
+ * @author Lee Rowlands contact at rowlandsgroup dot com
+ * 
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function my_forms_schema() {
+   $schema = array();
+  $schema['registration'] = array(
+    	'description' => "Records contacts added to a user's address book",
+    
+	'fields'      => array(
+      
+      	'uid' => array(
+        'description'   => 'User id of owning user',
+        'type'          => 'serial',
+        'size'          => 'medium',
+        'not null'      => TRUE,
+      ),
+    	'name' => array(
+        'description'   => 'name of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+      	'age' => array(
+        'description'   => 'age of contact',
+        'type'          => 'int',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+	'sex' => array(
+        'description'   => 'sex of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+	  ),
+	'email' => array(
+        'description'   => 'Email of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+	'phone' => array(
+        'description'   => 'PhoneNo of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),	  
+	'region' => array(
+        'description'   => 'Street address of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),      	
+	'addrlin1' => array(
+        'description'   => 'Street address of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+	'new' => array(
+        'description'   => 'options of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+	'prayer' => array(
+        'description'   => 'options of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+	'film' => array(
+        'description'   => 'options of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),
+	'door' => array(
+        'description'   => 'options of contact',
+        'type'          => 'varchar',
+        'size'          => 'normal',
+        'not null'      => FALSE,
+        'length'        => 255,
+      ),),
+                    
+    'primary key' => array('uid'),
+    'indexes' => array('uid' => array('uid'),),
+      
+  );
+  return $schema;
+}
+
+
+/**
+ * Implementation of hook_install().
+ */
+function my_forms_install() {
+  drupal_install_schema('registration');
+}
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function my_forms_uninstall() {
+  drupal_uninstall_schema('registration');
+}
+

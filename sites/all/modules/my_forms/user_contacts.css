@@ -1,0 +1,16 @@
+/*
+ * @file user_contacts.css
+ * Provides css for the module
+ * @copyright Copyright(c) 2010 Lee Rowlands
+ * @license GPL v2 http://www.fsf.org/licensing/licenses/gpl.html
+ * @author Lee Rowlands contact at rowlandsgroup dot com
+ * 
+ */
+/*show the alpha links on one line*/
+.alpha-links .item-list ul li {
+  display: inline-block;
+  background-image: none;
+  list-style: none;
+  float: left;
+  padding: 0 10px 10px 0;
+}
